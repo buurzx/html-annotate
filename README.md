@@ -16,7 +16,7 @@ The overlay is added when the page is served locally. It doesn't add scripts or 
 | Run | Python **3.9+** on macOS, Linux or another POSIX environment; a modern browser that can reach `127.0.0.1` |
 | Apply feedback | A coding agent with skills support, shell access to start a local server, and permission to edit the HTML. If it can't receive background notifications, tell it in chat when your comments are ready. |
 
-Node.js is only needed to install the skill. No Python packages, browser extension, or hosted service needed. The interface is currently in Russian; the steps below translate the main controls.
+Node.js is only needed to install the skill. No Python packages, browser extension, or hosted service needed.
 
 ## Install
 
@@ -31,8 +31,8 @@ Codex and Cursor use the copy in `~/.agents/skills/`, as does omp. The installer
 ## First review
 
 1. Open your project in the agent and ask: **“Open `mockup.html` for review with `html-annotate`.”** Use the local URL the agent gives you, not `file://`.
-2. Press **Alt+A** or click **комм.** (Comments). Select text or click a block, write your feedback, and click **Сохранить** (Save draft).
-3. Click **Отправить новые** (Send new comments). After the agent applies the changes, the panel shows **исправлено** (Fixed). Reload the page to see the changed HTML.
+2. Press **Alt+A** or click **Comments**. Select text or click a block, write your feedback, and click **Save**.
+3. Click **Send drafts**. After the agent applies the changes, the panel shows **Fixed**. Reload the page to see the changed HTML.
 
 ## Try the demo
 

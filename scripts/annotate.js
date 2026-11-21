@@ -49,9 +49,9 @@
   }
 
   function stateLabel(value) {
-    if (value === 'sent') return 'ждёт правки';
-    if (value === 'fixed') return 'исправлено';
-    return 'черновик';
+    if (value === 'sent') return 'Awaiting changes';
+    if (value === 'fixed') return 'Fixed';
+    return 'Draft';
   }
 
   function stateClass(value) {
@@ -162,9 +162,9 @@
     state.active = mode !== 'closed';
     els.drawer.hidden = mode === 'closed' || mode === 'pick';
     els.drawer.dataset.mode = mode;
-    els.fabLabel.textContent = mode === 'pick' ? 'Список' : 'комм.';
-    els.fab.setAttribute('aria-label', mode === 'pick' ? 'Открыть список комментариев' : 'Комментарии к странице');
-    if (mode === 'pick') toast('Выберите блок на странице · «Список» вернёт к комментариям');
+    els.fabLabel.textContent = mode === 'pick' ? 'Back to comments' : 'Comments';
+    els.fab.setAttribute('aria-label', mode === 'pick' ? 'Back to comments' : 'Page comments');
+    if (mode === 'pick') toast('Click a block or select text. Use Back to comments to return.');
     els.fab.setAttribute('aria-expanded', String(!els.drawer.hidden));
     els.fab.classList.toggle('mwann-on', state.active);
     document.documentElement.classList.toggle('mwann-active', canPick());
@@ -244,13 +244,13 @@
     var section = sectionFor(target);
     var quote = quoteFor(target);
     els.target.replaceChildren();
-    els.target.appendChild(node('b', '', section || 'страница'));
-    els.target.appendChild(document.createTextNode(' · ' + (target.localName || target.tagName || 'блок')));
+    els.target.appendChild(node('b', '', section || 'Page'));
+    els.target.appendChild(document.createTextNode(' · ' + (target.localName || target.tagName || 'block')));
     if (quote) els.target.appendChild(document.createTextNode(' · «' + quote.slice(0, 120) + '»'));
     els.composer.hidden = false;
     els.comment.value = '';
     els.comment.focus();
-    toast('Кликните «Сохранить» или Ctrl+Enter');
+    toast('Click Save or press Ctrl+Enter (⌘+Enter on Mac).');
   }
 
   function closeComposer() {
@@ -264,8 +264,8 @@
 
   function validComment(editor) {
     var value = editor.value;
-    var error = !value.trim() ? 'Комментарий пустой' :
-      Array.from(value).length > 4000 ? 'Комментарий длиннее 4000 символов' : '';
+    var error = !value.trim() ? 'Write a comment before saving.' :
+      Array.from(value).length > 4000 ? 'Comments can be up to 4,000 characters.' : '';
     if (!error) return true;
     toast(error, true);
     editor.focus();
@@ -275,7 +275,7 @@
   function addAnnotation() {
     if (!validComment(els.comment)) return;
     if (!state.target) {
-      toast('Сначала выберите блок', true);
+      toast('Select a block first.', true);
       return;
     }
 
@@ -323,7 +323,7 @@
 
   function markSent(items) {
     if (!items.length) {
-      toast('Нет черновиков для отправки', true);
+      toast('No drafts to send.', true);
       return;
     }
 
@@ -340,7 +340,7 @@
     var item = state.annotations.find(function (annotation) { return annotation.id === id; });
     if (!item) return;
     if (item.status === 'sent' || item.status === 'fixed') {
-      toast('Уже отправлено');
+      toast('This comment was already sent.');
       return;
     }
     markSent([item]);
@@ -356,7 +356,7 @@
 
     var drafts = draftCount();
     if (els.sendDrafts) {
-      els.sendDrafts.textContent = 'Отправить новые · ' + drafts;
+      els.sendDrafts.textContent = 'Send drafts · ' + drafts;
       els.sendDrafts.disabled = drafts === 0 || writing || !http;
     }
     els.retry.hidden = !dirty() || !http;
@@ -364,7 +364,7 @@
 
     if (!state.annotations.length) {
       var empty = node('p', 'mwann-empty',
-        'Пока пусто. Нажмите Alt+A или кнопку «комм.», затем кликните по блоку или выделите текст.');
+        'No comments yet. Click a block or select text on the page to start.');
       els.list.appendChild(empty);
       return;
     }
@@ -373,7 +373,7 @@
       var item = node('div', 'mwann-item' + (annotation.id === state.selectedId ? ' mwann-selected' : ''));
       var head = node('div', 'mwann-item-head');
       head.appendChild(node('span', 'mwann-no', String(index + 1)));
-      head.appendChild(node('span', 'mwann-section', annotation.section || 'страница'));
+      head.appendChild(node('span', 'mwann-section', annotation.section || 'Page'));
       head.appendChild(node('span', 'mwann-state ' + stateClass(annotation.status), stateLabel(annotation.status)));
       item.appendChild(head);
 
@@ -386,9 +386,9 @@
         item.appendChild(editor);
 
         var editActions = node('div', 'mwann-item-actions');
-        var save = button('Сохранить', 'save-edit', 'primary');
+        var save = button('Save', 'save-edit', 'primary');
         save.setAttribute('data-id', annotation.id);
-        var cancel = button('Отмена', 'cancel-edit');
+        var cancel = button('Cancel', 'cancel-edit');
         editActions.appendChild(save);
         editActions.appendChild(cancel);
         item.appendChild(editActions);
@@ -396,20 +396,20 @@
         item.appendChild(node('p', 'mwann-comment', annotation.comment));
 
         var actions = node('div', 'mwann-item-actions');
-        var show = button('Показать', 'show');
+        var show = button('Show on page', 'show');
         show.setAttribute('data-id', annotation.id);
         actions.appendChild(show);
 
         if ((annotation.status || 'draft') === 'draft') {
-          var send = button('Отправить', 'send', 'primary');
+          var send = button('Send', 'send', 'primary');
           send.disabled = writing || !http;
           send.setAttribute('data-id', annotation.id);
           actions.appendChild(send);
         }
 
-        var edit = button('Править', 'edit');
+        var edit = button('Edit', 'edit');
         edit.setAttribute('data-id', annotation.id);
-        var del = button('Удалить', 'delete', 'danger');
+        var del = button('Delete', 'delete', 'danger');
         del.setAttribute('data-id', annotation.id);
         actions.appendChild(edit);
         actions.appendChild(del);
@@ -432,7 +432,7 @@
     var payload = JSON.stringify(exportPayload(), null, 2);
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(payload).then(function () {
-        toast('JSON скопирован');
+        toast('Copied JSON to the clipboard.');
       }, function () {
         legacyCopy(payload);
       });
@@ -449,8 +449,8 @@
     area.style.left = '-9999px';
     document.body.appendChild(area);
     area.select();
-    try { document.execCommand('copy'); toast('JSON скопирован'); }
-    catch (_) { toast('Не удалось скопировать', true); }
+    try { document.execCommand('copy'); toast('Copied JSON to the clipboard.'); }
+    catch (_) { toast('Could not copy JSON.', true); }
     document.body.removeChild(area);
   }
 
@@ -465,7 +465,7 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    toast('JSON скачан');
+    toast('Downloaded JSON.');
   }
 
   function same(a, b) {
@@ -522,7 +522,7 @@
     var data = await response.json().catch(function () { return null; });
     if (!response.ok && response.status !== 409) throw new Error(data && data.error || 'HTTP ' + response.status);
     if (!data || !Number.isSafeInteger(data.version) || data.version < 0 || !Array.isArray(data.annotations)) {
-      throw new Error(data && data.error || 'нет подтверждённого снимка');
+      throw new Error(data && data.error || 'The server did not return a valid comment list.');
     }
     return data;
   }
@@ -534,7 +534,7 @@
   async function refresh(silent) {
     if (!http || writing || polling) return;
     if (state.editingId || state.target) {
-      if (!silent) toast('Сначала закройте редактор', true);
+      if (!silent) toast('Close the editor before refreshing.', true);
       return;
     }
     // Never replace an editor opened, or a save begun, while this GET was in flight.
@@ -545,10 +545,10 @@
       if (generation !== ticket || state.editingId || state.target || (silent && data.version === version)) return;
       var copied = adopt(data);
       render();
-      status(copied ? 'Конфликт: ваша версия оставлена отдельным черновиком.' :
-        dirty() ? 'Есть несохранённые изменения · проверьте и сохраните' : 'обновлено · ' + base.length + ' комм.', dirty());
+      status(copied ? 'Someone else changed this comment. Your edit is a separate draft.' :
+        dirty() ? 'Review and save your unsaved changes.' : 'Comments up to date.', dirty());
     } catch (error) {
-      if (generation === ticket) status('сервер недоступен: ' + error.message + ' · повторите обновление', true);
+      if (generation === ticket) status('Could not refresh comments: ' + error.message + ' · Try refreshing again.', true);
     } finally {
       polling = false;
     }
@@ -560,9 +560,9 @@
       try {
         localStorage.setItem(KEY, JSON.stringify(state.annotations));
         base = state.annotations;
-        status('локально · для передачи скачайте JSON', false);
+        status('Saved locally. Download JSON to share.', false);
       } catch (_) {
-        status('не удалось сохранить локально · скачайте JSON до закрытия страницы', true);
+        status('Could not save locally. Download JSON before closing this page.', true);
       }
       render();
       return;
@@ -572,7 +572,7 @@
     generation++;
     render();
     els.drawer.setAttribute('aria-busy', 'true');
-    status('сохраняю на сервере…', false);
+    status('Saving…', false);
     try {
       if (version === null) adopt(await getState());
       var requested = byId(items || []);
@@ -600,32 +600,32 @@
           return item && item.sentAt === entry[1] && (item.status === 'sent' || item.status === 'fixed');
         })) {
           sending.forEach(function (_, id) { attempts.delete(id); });
-          status('Доставка подтверждена · ' + sending.size, false);
+          status('Delivery confirmed · ' + sending.size, false);
           return;
         }
-        var conflict = copied ? 'Конфликт: ваша версия оставлена отдельным черновиком. Проверьте и сохраните.' :
-          'Загружена версия сервера; проверьте и при необходимости повторите действие.';
+        var conflict = copied ? 'Someone else changed this comment. Review and save your separate draft.' :
+          'Loaded the latest comments. Review them and retry if needed.';
         status(data.error ? data.error + ' · ' + conflict : conflict, true);
         return;
       }
       var saved = byId(data.annotations);
       if (saved.size !== next.length || next.some(function (a) { return !saved.has(a.id); })) {
-        throw new Error('сохранение списка не подтверждено');
+        throw new Error('The server did not confirm the saved list.');
       }
       sending.forEach(function (sentAt, id) {
         var item = saved.get(id);
         if (!item || item.sentAt !== sentAt || (item.status !== 'sent' && item.status !== 'fixed')) {
-          throw new Error('отправка не подтверждена');
+          throw new Error('The server did not confirm delivery.');
         }
       });
       version = data.version;
       state.annotations = base = data.annotations;
       sending.forEach(function (_, id) { attempts.delete(id); });
-      var message = sending.size ? 'Отправлено: ' + sending.size : 'Сохранено на сервере';
+      var message = sending.size ? 'Sent: ' + sending.size : 'Saved to server';
       status(message, false);
       toast(message);
     } catch (error) {
-      status('Нет подтверждения: ' + error.message + ' · повторите действие или скачайте JSON', true);
+      status('Not confirmed: ' + error.message + ' · Try again or download JSON.', true);
     } finally {
       writing = false;
       els.drawer.removeAttribute('aria-busy');
@@ -642,15 +642,15 @@
       var local = JSON.parse(localStorage.getItem(KEY) || '[]');
       if (Array.isArray(local)) state.annotations = base = local;
     } catch (_) {}
-    status('локально · для передачи скачайте JSON', false);
+    status('Saved locally. Download JSON to share.', false);
     render();
   }
 
   function mount() {
     els.fab = node('button', 'mwann-fab');
     els.fab.type = 'button';
-    els.fab.setAttribute('aria-label', 'Комментарии к странице');
-    els.fabLabel = node('span', '', 'комм.');
+    els.fab.setAttribute('aria-label', 'Page comments');
+    els.fabLabel = node('span', '', 'Comments');
     els.fab.appendChild(els.fabLabel);
     els.fabCount = node('span', 'mwann-count', '0');
     els.fabCount.hidden = true;
@@ -658,32 +658,32 @@
 
     els.drawer = node('aside', 'mwann-drawer');
     els.drawer.hidden = true;
-    els.drawer.setAttribute('aria-label', 'Комментарии к странице');
+    els.drawer.setAttribute('aria-label', 'Page comments');
 
     var head = node('header', 'mwann-head');
     head.appendChild(node('p', 'mwann-eyebrow', 'annotation mode'));
     var title = node('div', 'mwann-title');
-    var h2 = node('h2', '', 'Комментарии');
+    var h2 = node('h2', '', 'Comments');
     els.count = node('span', 'mwann-count', '0');
     title.appendChild(h2);
     title.appendChild(els.count);
     head.appendChild(title);
     head.appendChild(node('p', 'mwann-hint',
-      '«Выбрать на странице» скрывает список. Кликните по блоку или выделите текст, напишите комментарий и сохраните. «Отправить новые» передаёт черновики агенту.'));
-    els.status = node('p', 'mwann-status', 'загрузка…');
+      'Use Select on page to hide this panel. Click a block or select text, then save your comment. Send drafts when you’re ready for the agent to review them.'));
+    els.status = node('p', 'mwann-status', 'Loading…');
     head.appendChild(els.status);
     els.status.setAttribute('role', 'status');
 
     var actions = node('div', 'mwann-actions');
-    els.sendDrafts = button('Отправить новые · 0', 'send-drafts', 'primary');
+    els.sendDrafts = button('Send drafts · 0', 'send-drafts', 'primary');
     els.sendDrafts.disabled = true;
-    var refreshBtn = button('Обновить', 'refresh');
-    var copy = button('Скопировать JSON', 'copy');
-    var download = button('Скачать JSON', 'download');
-    var clear = button('Очистить', 'clear', 'danger');
-    var close = button('Закрыть', 'close');
-    actions.appendChild(button('Выбрать на странице', 'pick'));
-    els.retry = button('Сохранить изменения', 'retry');
+    var refreshBtn = button('Refresh', 'refresh');
+    var copy = button('Copy JSON', 'copy');
+    var download = button('Download JSON', 'download');
+    var clear = button('Delete all', 'clear', 'danger');
+    var close = button('Close', 'close');
+    actions.appendChild(button('Select on page', 'pick'));
+    els.retry = button('Save changes', 'retry');
     actions.appendChild(els.retry);
     actions.appendChild(els.sendDrafts);
     actions.appendChild(refreshBtn);
@@ -698,10 +698,10 @@
     els.composer.hidden = true;
     els.target = node('p', 'mwann-target', '');
     els.comment = node('textarea', 'mwann-textarea');
-    els.comment.setAttribute('placeholder', 'Что поправить? Например: «здесь неверный порог» или «этот абзац убрать»');
+    els.comment.setAttribute('placeholder', 'What should change? For example: “Change the opening time to 10:30.”');
     var composerActions = node('div', 'mwann-composer-actions');
-    var cancel = button('Отмена', 'cancel');
-    var save = button('Сохранить', 'save', 'primary');
+    var cancel = button('Cancel', 'cancel');
+    var save = button('Save', 'save', 'primary');
     composerActions.appendChild(cancel);
     composerActions.appendChild(save);
     els.composer.appendChild(els.target);
@@ -732,11 +732,11 @@
       var id = act.getAttribute('data-id');
       var kind = act.getAttribute('data-act');
       if (writing && kind !== 'copy' && kind !== 'download' && kind !== 'close') {
-        toast('Сначала дождитесь сохранения');
+        toast('Wait for the save to finish.');
         return;
       }
       if (state.editingId && !['save-edit', 'cancel-edit', 'copy', 'download', 'close'].includes(kind)) {
-        toast('Сначала сохраните или отмените правку', true);
+        toast('Save or cancel your edit first.', true);
         return;
       }
 
@@ -750,7 +750,7 @@
       else if (kind === 'download') downloadJson();
       else if (kind === 'clear') {
         if (!state.annotations.length) return;
-        if (window.confirm('Удалить все комментарии на этой странице?')) {
+        if (window.confirm('Delete all comments on this page?')) {
           state.annotations = [];
           state.selectedId = null;
           persist();
@@ -760,7 +760,7 @@
       else if (kind === 'show') {
         var found = findElement(state.annotations.find(function (a) { return a.id === id; }) || {});
         if (!found) {
-          toast('Блок не найден однозначно на этой странице', true);
+          toast('Could not match this comment to a single block on the page.', true);
           return;
         }
         state.selectedId = id;
