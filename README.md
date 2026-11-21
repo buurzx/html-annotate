@@ -1,27 +1,59 @@
 # html-annotate
 
-Review local HTML with a coding agent. Select text or a block in your browser, send a batch of comments, and let the agent edit the original file. The annotation tools are injected into the served page, not written into your HTML.
+**Give feedback on a local HTML page without leaving the browser.** Click the exact block or select text, write what should change, then send your comments to your coding agent. The agent edits the original HTML; the panel shows which comments are fixed.
 
-## Install once
+[Requirements](#requirements) · [Install](#install) · [First review](#first-review) · [Try the demo](#try-the-demo)
+
+![A sample HTML page beside the annotation panel, showing a workshop-time comment waiting for a fix](assets/review.png)
+
+The overlay is added when the page is served locally. It doesn't add scripts or styles to your source HTML.
+
+## Requirements
+
+| When | What you need |
+| --- | --- |
+| Install | Node.js with `npx` and access to GitHub and the npm registry |
+| Run | Python **3.9+** on macOS, Linux or another POSIX environment; a modern browser that can reach `127.0.0.1` |
+| Apply feedback | A coding agent with skills support, shell access to start a local server, and permission to edit the HTML. If it can't receive background notifications, tell it in chat when your comments are ready. |
+
+Node.js is only needed to install the skill. No Python packages, browser extension, or hosted service needed. The interface is currently in Russian; the steps below translate the main controls.
+
+## Install
+
+Run once for all your projects:
 
 ```sh
 npx --yes skills add buurzx/html-annotate --skill html-annotate --global --agent codex cursor claude-code --yes
 ```
 
-The global install is shared across projects. Codex, Cursor and hosts such as omp can discover the skill in `~/.agents/skills`; the installer also links it for Claude Code. Node.js with `npx` is needed only for installation. The local server needs Python 3.9+ on a POSIX system, with no pip dependencies.
+Codex and Cursor use the copy in `~/.agents/skills/`, as does omp. The installer also links it for Claude Code. For a different supported host, change the `--agent` targets.
 
-## Use
+## First review
 
-1. In the project with your HTML, ask your agent: **“Open `mockup.html` for annotation with html-annotate.”**
-2. Visit the local URL. Press **Alt+A** or **комм.**, select a block, enter a comment, and save the draft. Press **Отправить новые** to send your drafts to the agent.
-3. The agent reads the batch, edits the source and marks the processed revisions fixed. Reload the page to see the HTML changes.
+1. Open your project in the agent and ask: **“Open `mockup.html` for review with `html-annotate`.”** Use the local URL the agent gives you, not `file://`.
+2. Press **Alt+A** or click **комм.** (Comments). Select text or click a block, write your feedback, and click **Сохранить** (Save draft).
+3. Click **Отправить новые** (Send new comments). After the agent applies the changes, the panel shows **исправлено** (Fixed). Reload the page to see the changed HTML.
 
-Comments stay in the project's `.annotate/` directory. Serve trusted static pages only. The server binds to `127.0.0.1`; one review instance is intended for one page. See [SKILL.md](SKILL.md) for the protocol and multi-project setup.
+## Try the demo
 
-## Tests
+To preview the overlay without an agent, clone this repository and run the server against the included [sample page](examples/review.html):
 
 ```sh
-python3 -B -m unittest discover -s tests -v
+git clone https://github.com/buurzx/html-annotate.git
+cd html-annotate
+python3 -u scripts/annotate_server.py --root examples --port 0 --state-dir "$(mktemp -d)"
 ```
 
-[MIT license](LICENSE).
+Open the `http://127.0.0.1:<port>/` URL printed by the server and append `review.html`. You can save and send comments in the demo; applying them to the HTML still requires an agent. Stop the server with **Ctrl+C**.
+
+## Where the data goes
+
+By default, drafts and sent batches stay in `.annotate/` under the project being reviewed. Installing globally does not share comments between projects. Run one server per page; for simultaneous reviews, use different ports and state directories.
+
+The server is local-only and serves files from its configured root. Point it at a folder of trusted HTML and assets, not a directory containing secrets. It's designed for static pages, not hosted collaboration or live app debugging.
+
+## Development
+
+See [SKILL.md](SKILL.md) for the agent workflow and API. Run the integration tests with `python3 -B -m unittest discover -s tests -v`.
+
+[MIT license](LICENSE) · [Releases](https://github.com/buurzx/html-annotate/releases)

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Field Notes — review example</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f6f4ee;
+      color: #20332b;
+      font: 16px/1.55 system-ui, sans-serif;
+    }
+    .edition {
+      max-width: 37rem;
+      padding: clamp(1.5rem, 5vw, 3.5rem);
+    }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: .9rem;
+      border-bottom: 1px solid #b8beb0;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .edition h1 {
+      margin: 2rem 0 .6rem;
+      font: 500 clamp(2.4rem, 6vw, 4rem)/1 Georgia, serif;
+      letter-spacing: -.045em;
+    }
+    .lede { max-width: 28rem; color: #42564b; }
+    .feature {
+      margin-top: 1.9rem;
+      padding: 1.25rem 1.5rem;
+      background: #e3ebe0;
+      border-radius: .5rem;
+    }
+    .feature h2 { margin: 0 0 .35rem; font: 500 1.6rem Georgia, serif; }
+    .feature p { margin: 0; }
+    .demo-tip { margin-top: 1.5rem; color: #42564b; font-size: .875rem; }
+  </style>
+</head>
+<body>
+  <main class="edition">
+    <header class="masthead"><span>Field Notes</span><span>Issue 01</span></header>
+    <h1 id="headline">A quieter way<br>to review.</h1>
+    <p class="lede">A tiny editorial mockup with real targets for browser annotations. Try marking the headline or the workshop card.</p>
+    <section class="feature" aria-labelledby="workshop">
+      <h2 id="workshop">Weekend workshop</h2>
+      <p id="workshop-time">Doors open on Saturday at 10:00.</p>
+    </section>
+    <p class="demo-tip">Demo page · Open it through the annotation server to reveal the comment panel.</p>
+  </main>
+</body>
+</html>

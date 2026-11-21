@@ -24,6 +24,8 @@ The [Skills CLI](https://skills.sh/) installs the skill and its bundled server, 
 
 These targets cover Codex, Cursor and Claude Code; tools that discover `~/.agents/skills` (including omp) use the same installed copy. For another Skills CLI agent, replace the names after `--agent`. When installing from a published Git repository, use its URL instead of `./`.
 
+The agent host needs shell access to start the server and permission to edit the target HTML. The user's browser must be able to reach that server at `127.0.0.1`.
+
 ## Workflow
 
 1. Create or locate the HTML under the project root. If it is diagram-heavy, build it with the `diagram-design` skill first. Do not add the overlay to the file.
@@ -53,7 +55,7 @@ These targets cover Codex, Cursor and Claude Code; tools that discover `~/.agent
    tail -n 0 -F .annotate/annotations-inbox.jsonl
    ```
 
-   Use `notify` matching `"event": *"sent"`. Also check the existing inbox after starting the watcher: `tail -n 0` only reports later writes. After an interruption, match backlog entries against the current `sent` revisions before acting on them.
+   Use `notify` matching `"event": *"sent"`. Also check the existing inbox after starting the watcher: `tail -n 0` only reports later writes. If the host has no background notifications, tell the user to ping the agent after sending; read the inbox on that turn. After an interruption, match backlog entries against the current `sent` revisions before acting on them.
 
 5. Press `Alt+A` (or `комм.`), click a block or select text, write a comment, and save the draft. On a narrow screen the list stays hidden while choosing a target; **Список** returns to it. Press **Отправить новые** to deliver drafts. If delivery is not confirmed, retry from the overlay; do not assume the agent received them.
 
