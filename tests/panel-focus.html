@@ -1,0 +1,52 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keyboard review regression</title>
+<link rel="stylesheet" href="../scripts/annotate.css">
+<script defer src="../scripts/annotate.js"></script>
+<label>Host input <input></label>
+<p id="target">Comment on this paragraph.</p>
+<output>Not run</output>
+<script>
+window.addEventListener('load', () => {
+  const $ = selector => document.querySelector(selector);
+  const key = (key, options) => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles: true, ...options}));
+  function check(condition, message) { if (!condition) throw Error(message); }
+  try {
+    $('input').focus();
+    key('a', {altKey: true});
+    const fab = $('.mwann-fab');
+    if (matchMedia('(max-width: 640px)').matches) fab.click();
+    check($('.mwann-drawer').contains(document.activeElement), 'Opening the list left keyboard focus on the host');
+    $('[data-act="pick"]').click();
+    check(document.activeElement === fab, 'The return button did not get focus');
+    $('#target').click();
+    const editor = $('.mwann-textarea');
+    editor.value = 'Unsent feedback';
+    const dock = $('[data-act="dock"]');
+    const desktop = matchMedia('(min-width: 641px)').matches;
+    const width = () => $('#target').getBoundingClientRect().width;
+    const fullWidth = width();
+    check(Boolean(dock.getClientRects().length) === desktop, 'Unexpected dock control visibility');
+    if (desktop) {
+      dock.click();
+      check(width() < fullWidth && $('#target').getBoundingClientRect().right <= $('.mwann-drawer').getBoundingClientRect().left, 'Docking covered the page instead of resizing it');
+    }
+    key('Escape');
+    check(document.activeElement === fab && fab.getClientRects().length, 'Escape did not focus the visible launcher');
+    check(width() === fullWidth, 'The hidden panel still reserves space');
+    fab.click();
+    check(document.activeElement === editor && editor.value === 'Unsent feedback', 'Reopening lost the draft or focus');
+    if (desktop) {
+      check(width() < fullWidth, 'Reopening forgot the docked layout');
+      dock.click();
+      check(width() === fullWidth && editor.value === 'Unsent feedback', 'Undocking lost page width or draft');
+    }
+    $('[data-act="cancel"]').click();
+    $('output').textContent = 'PASS';
+  } catch (error) {
+    $('output').textContent = 'FAIL: ' + error.message;
+    throw error;
+  }
+});
+</script>

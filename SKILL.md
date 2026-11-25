@@ -3,7 +3,7 @@ name: html-annotate
 description: Create or open a local HTML page with a live annotation overlay, let the user comment in the browser, and apply comments in batches. Use when the user asks to build an HTML page and review it through annotate, or to annotate an existing local HTML.
 license: MIT
 metadata:
-  version: "0.5"
+  version: "0.6"
 ---
 
 # HTML Annotate
@@ -58,6 +58,8 @@ The agent host needs shell access to start the server and permission to edit the
    Use `notify` matching `"event": *"sent"`. Also check the existing inbox after starting the watcher: `tail -n 0` only reports later writes. If the host has no background notifications, tell the user to ping the agent after sending; read the inbox on that turn. After an interruption, match backlog entries against the current `sent` revisions before acting on them.
 
 5. Press `Alt+A` (or **Comments**), click a block or select text, write a comment, and click **Save**. On a narrow screen the list stays hidden while choosing a target; **Back to comments** returns to it. Press **Send drafts** to deliver drafts. If delivery is not confirmed, retry from the overlay; do not assume the agent received them.
+
+   On desktop the panel floats by default. Drag **Drag panel** to move it, or use **Dock right** to reserve space beside the page. **Undock** returns it to its floating position. **Esc** or **Hide** restores the page width; reopen **Comments** to resume the same layout and unfinished comment in the same tab.
 
    Comments preserve spaces, tabs and line breaks. The limit is 4000 Unicode code points per comment; shorten an overlong comment before saving. If **Show on page** cannot identify the target after an HTML edit, check the recorded quote and section instead of assuming the first matching block is correct.
 
