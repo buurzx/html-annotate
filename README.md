@@ -4,7 +4,7 @@
 
 [Requirements](#requirements) · [Install](#install) · [First review](#first-review) · [Try the demo](#try-the-demo)
 
-![A sample HTML page beside the annotation panel, showing a workshop-time comment waiting for a fix](assets/review.png)
+![Field Notes demo with a floating Comments panel showing Dock right, Hide · Esc, and a sent comment asking to change the workshop time](assets/review.png)
 
 The overlay is added when the page is served locally. It doesn't add scripts or styles to your source HTML.
 
