@@ -34,6 +34,8 @@ Codex and Cursor use the copy in `~/.agents/skills/`, as does omp. The installer
 2. Press **Alt+A** or click **Comments**. Select text or click a block, write your feedback, and click **Save**.
 3. Click **Send drafts**. After the agent applies the changes, the panel shows **Fixed**. Reload the page to see the changed HTML.
 
+On desktop, drag the panel by **Drag panel** to see what's underneath. **Esc** or **Hide** collapses it without discarding the text you're writing. Click **Comments** to resume before reloading.
+
 ## Try the demo
 
 To preview the overlay without an agent, clone this repository and run the server against the included [sample page](examples/review.html):
@@ -55,5 +57,6 @@ The server is local-only and serves files from its configured root. Point it at 
 ## Development
 
 See [SKILL.md](SKILL.md) for the agent workflow and API. Run the integration tests with `python3 -B -m unittest discover -s tests -v`.
+Open `tests/panel-focus.html` directly in a browser to check keyboard navigation and draft restoration. It displays `PASS` or the failed check.
 
 [MIT license](LICENSE) · [Releases](https://github.com/buurzx/html-annotate/releases)

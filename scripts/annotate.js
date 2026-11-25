@@ -161,6 +161,7 @@
     state.mode = mode;
     state.active = mode !== 'closed';
     els.drawer.hidden = mode === 'closed' || mode === 'pick';
+    els.fab.hidden = !els.drawer.hidden;
     els.drawer.dataset.mode = mode;
     els.fabLabel.textContent = mode === 'pick' ? 'Back to comments' : 'Comments';
     els.fab.setAttribute('aria-label', mode === 'pick' ? 'Back to comments' : 'Page comments');
@@ -170,6 +171,8 @@
     document.documentElement.classList.toggle('mwann-active', canPick());
     clearHover();
     state.hovered = null;
+    if (els.drawer.hidden) els.fab.focus();
+    else if (mode === 'list') (els.list.querySelector('.mwann-edit') || els.hide).focus();
   }
 
   function canPick() {
@@ -178,8 +181,14 @@
   }
 
   function setActive(on) {
-    if (!on) closeComposer();
-    view(on ? (mobile.matches && !state.editingId ? 'pick' : 'list') : 'closed');
+    if (!on) {
+      view('closed');
+    } else if (state.target) {
+      view('compose');
+      els.comment.focus();
+    } else {
+      view(mobile.matches && !state.editingId ? 'pick' : 'list');
+    }
   }
 
   function clearHover() {
@@ -660,7 +669,7 @@
     els.drawer.hidden = true;
     els.drawer.setAttribute('aria-label', 'Page comments');
 
-    var head = node('header', 'mwann-head');
+    var head = node('div', 'mwann-head');
     head.appendChild(node('p', 'mwann-eyebrow', 'annotation mode'));
     var title = node('div', 'mwann-title');
     var h2 = node('h2', '', 'Comments');
@@ -681,7 +690,30 @@
     var copy = button('Copy JSON', 'copy');
     var download = button('Download JSON', 'download');
     var clear = button('Delete all', 'clear', 'danger');
-    var close = button('Close', 'close');
+    var bar = node('div', 'mwann-bar');
+    var grip = node('span', 'mwann-grip', 'Drag panel');
+    var grabX, grabY, roomX, roomY;
+    function position(offset, room) {
+      return (room > 0 ? 100 * Math.min(room, Math.max(0, offset)) / room : 0) + '%';
+    }
+    grip.addEventListener('pointerdown', function (event) {
+      if (!event.isPrimary || event.button !== 0) return;
+      var rect = els.drawer.getBoundingClientRect();
+      grabX = event.clientX - rect.left;
+      grabY = event.clientY - rect.top;
+      roomX = document.documentElement.clientWidth - rect.width;
+      roomY = document.documentElement.clientHeight - rect.height;
+      grip.setPointerCapture(event.pointerId);
+    });
+    grip.addEventListener('pointermove', function (event) {
+      if (event.buttons === 1 && event.isPrimary && grip.hasPointerCapture(event.pointerId)) {
+        els.drawer.style.setProperty('--mwann-x', position(event.clientX - grabX, roomX));
+        els.drawer.style.setProperty('--mwann-y', position(event.clientY - grabY, roomY));
+      }
+    });
+    bar.appendChild(grip);
+    els.hide = button('Hide · Esc', 'close');
+    bar.appendChild(els.hide);
     actions.appendChild(button('Select on page', 'pick'));
     els.retry = button('Save changes', 'retry');
     actions.appendChild(els.retry);
@@ -690,7 +722,6 @@
     actions.appendChild(copy);
     actions.appendChild(download);
     actions.appendChild(clear);
-    actions.appendChild(close);
     head.appendChild(actions);
 
     els.list = node('div', 'mwann-list');
@@ -708,6 +739,7 @@
     els.composer.appendChild(els.comment);
     els.composer.appendChild(composerActions);
 
+    els.drawer.appendChild(bar);
     els.drawer.appendChild(head);
     els.drawer.appendChild(els.list);
     els.drawer.appendChild(els.composer);
@@ -844,12 +876,12 @@
 
       if (event.key === 'Escape' && state.active) {
         event.preventDefault();
-        if (!els.composer.hidden) closeComposer();
-        else setActive(false);
+        event.stopPropagation();
+        setActive(false);
         return;
       }
 
-      if (!writing && (event.ctrlKey || event.metaKey) && event.key === 'Enter' && !els.composer.hidden) {
+      if (!writing && (event.ctrlKey || event.metaKey) && event.key === 'Enter' && state.mode === 'compose') {
         event.preventDefault();
         addAnnotation();
       }
