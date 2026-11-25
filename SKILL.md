@@ -59,7 +59,7 @@ The agent host needs shell access to start the server and permission to edit the
 
 5. Press `Alt+A` (or **Comments**), click a block or select text, write a comment, and click **Save**. On a narrow screen the list stays hidden while choosing a target; **Back to comments** returns to it. Press **Send drafts** to deliver drafts. If delivery is not confirmed, retry from the overlay; do not assume the agent received them.
 
-   On desktop, drag **Drag panel** in any direction to uncover the page without resizing it. **Esc** or **Hide** collapses the panel; reopen **Comments** to resume an unfinished comment in the same tab.
+   On desktop the panel floats by default. Drag **Drag panel** to move it, or use **Dock right** to reserve space beside the page. **Undock** returns it to its floating position. **Esc** or **Hide** restores the page width; reopen **Comments** to resume the same layout and unfinished comment in the same tab.
 
    Comments preserve spaces, tabs and line breaks. The limit is 4000 Unicode code points per comment; shorten an overlong comment before saving. If **Show on page** cannot identify the target after an HTML edit, check the recorded quote and section instead of assuming the first matching block is correct.
 

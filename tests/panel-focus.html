@@ -23,10 +23,25 @@ window.addEventListener('load', () => {
     $('#target').click();
     const editor = $('.mwann-textarea');
     editor.value = 'Unsent feedback';
+    const dock = $('[data-act="dock"]');
+    const desktop = matchMedia('(min-width: 641px)').matches;
+    const width = () => $('#target').getBoundingClientRect().width;
+    const fullWidth = width();
+    check(Boolean(dock.getClientRects().length) === desktop, 'Unexpected dock control visibility');
+    if (desktop) {
+      dock.click();
+      check(width() < fullWidth && $('#target').getBoundingClientRect().right <= $('.mwann-drawer').getBoundingClientRect().left, 'Docking covered the page instead of resizing it');
+    }
     key('Escape');
     check(document.activeElement === fab && fab.getClientRects().length, 'Escape did not focus the visible launcher');
+    check(width() === fullWidth, 'The hidden panel still reserves space');
     fab.click();
     check(document.activeElement === editor && editor.value === 'Unsent feedback', 'Reopening lost the draft or focus');
+    if (desktop) {
+      check(width() < fullWidth, 'Reopening forgot the docked layout');
+      dock.click();
+      check(width() === fullWidth && editor.value === 'Unsent feedback', 'Undocking lost page width or draft');
+    }
     $('[data-act="cancel"]').click();
     $('output').textContent = 'PASS';
   } catch (error) {

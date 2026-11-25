@@ -34,7 +34,7 @@ Codex and Cursor use the copy in `~/.agents/skills/`, as does omp. The installer
 2. Press **Alt+A** or click **Comments**. Select text or click a block, write your feedback, and click **Save**.
 3. Click **Send drafts**. After the agent applies the changes, the panel shows **Fixed**. Reload the page to see the changed HTML.
 
-On desktop, drag the panel by **Drag panel** to see what's underneath. **Esc** or **Hide** collapses it without discarding the text you're writing. Click **Comments** to resume before reloading.
+On desktop, the panel floats by default. Drag it by **Drag panel**, or choose **Dock right** to place it beside the page. **Undock** restores the floating position. In either layout, **Esc** or **Hide** collapses the panel without discarding your text. Click **Comments** to resume before reloading.
 
 ## Try the demo
 

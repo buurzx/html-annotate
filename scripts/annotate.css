@@ -369,10 +369,17 @@ html.mwann-active .mwann-fab * {
   border-bottom: 1px solid var(--mwann-rule);
 }
 
-.mwann-grip { display: none; }
+.mwann-grip, .mwann-dock { display: none; }
 
 @media (min-width: 641px) {
-  .mwann-drawer {
+  html:has(> body > .mwann-docked:not([hidden])) {
+    box-sizing: border-box;
+    max-width: calc(100% - var(--mwann-drawer-w));
+  }
+
+  .mwann-dock { display: inline-block; }
+
+  .mwann-drawer:not(.mwann-docked) {
     top: var(--mwann-y, 12px);
     left: var(--mwann-x, calc(100% - 12px));
     right: auto;
@@ -384,7 +391,7 @@ html.mwann-active .mwann-fab * {
     border-radius: 8px;
   }
 
-  .mwann-drawer .mwann-bar .mwann-grip {
+  .mwann-drawer:not(.mwann-docked) .mwann-grip {
     display: block;
     flex: 1;
     color: var(--mwann-muted);

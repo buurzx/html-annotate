@@ -712,6 +712,8 @@
       }
     });
     bar.appendChild(grip);
+    var dock = button('Dock right', 'dock', 'mwann-dock');
+    bar.appendChild(dock);
     els.hide = button('Hide · Esc', 'close');
     bar.appendChild(els.hide);
     actions.appendChild(button('Select on page', 'pick'));
@@ -763,6 +765,11 @@
       event.stopPropagation();
       var id = act.getAttribute('data-id');
       var kind = act.getAttribute('data-act');
+      if (kind === 'dock') {
+        var docked = els.drawer.classList.toggle('mwann-docked');
+        dock.textContent = docked ? 'Undock' : 'Dock right';
+        return;
+      }
       if (writing && kind !== 'copy' && kind !== 'download' && kind !== 'close') {
         toast('Wait for the save to finish.');
         return;
